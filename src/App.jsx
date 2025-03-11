@@ -109,7 +109,7 @@ function App() {
               <aside>
                 <p className="text-xl font-semibold">
                   Build by{" "}
-                  <a className="text-accent" href="https://github.com/BossNattawat">
+                  <a className="text-accent" target='blank' href="https://github.com/BossNattawat">
                     BossNattawat
                   </a>
                 </p>
