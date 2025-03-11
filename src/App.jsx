@@ -10,14 +10,11 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const [hasExample, setHasExample] = useState(false)
-
   const [data, setData] = useState(null)
 
   function searchWord(e) {
     e.preventDefault()
 
-    setHasExample(false)
     setData(null)
 
     if(!word) {
@@ -33,7 +30,6 @@ function App() {
     axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en_US/${word.toLowerCase().trim()}`)
       .then((response) => {
         setData(response.data)
-        checkExample()
         setLoading(false)
       })
       .catch((error) => {
@@ -42,17 +38,6 @@ function App() {
         setError(true)
         setLoading(false)
       })
-  }
-
-  function checkExample(){
-    if(data){
-      data[0].meanings[0].definitions.forEach((definition) => {
-        if(definition.example){
-          setHasExample(true)
-          return
-        }
-      })
-    }
   }
   
   return (
@@ -81,33 +66,42 @@ function App() {
             )}
 
             {data && (
-              <div className="my-5 w-full max-w-md p-8 bg-base-300 rounded-lg shadow-lg flex flex-col gap-5">
-                <h1 className='text-3xl text-base-content font-semibold underline'>{data[0].word}</h1>
-                <div>
-                  <h2 className='text-accent text-xl font-semibold'>Parts of speech:</h2>
-                  <p className='text-base-content'>{data[0].meanings[0].partOfSpeech}</p>
-                </div>
-                <div className="">
-                  <h2 className='text-accent text-xl font-semibold mb-3'>Definitions:</h2>
-                  <ul>
-                    {data[0].meanings[0].definitions.map((definition, index) => (
-                      <li key={index} className='mb-3'>
-                        <p className='text-base-content'><b>{index + 1}.</b> {definition.definition}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="">
-                  {hasExample && (
-                    <>
-                      <h2 className='text-accent text-xl font-semibold mb-3'>Examples:</h2>
-                      {data[0].meanings[0].definitions.map((definition, index) => (
-                        definition.example && <p key={index} className='text-base-content mb-3'><b>-</b> {definition.example}</p>
-                      ))}
-                    </>
-                  )}
-                </div>
-              </div>
+              <>
+                {data[0].meanings.map((meaning, index) => (
+                  <div key={index} className="my-5 w-full max-w-md p-8 bg-base-300 rounded-lg shadow-lg flex flex-col gap-5">
+                    <h1 className='text-3xl text-base-content font-semibold underline'>{data[0].word}</h1>
+                    <div>
+                      <h2 className='text-accent text-xl font-semibold'>Parts of speech:</h2>
+                      <p className='text-base-content'>{meaning.partOfSpeech}</p>
+                    </div>
+                    <div>
+                      <h2 className='text-accent text-xl font-semibold mb-3'>Definitions:</h2>
+                      <ul>
+                        {meaning.definitions.map((definition, index) => (
+                          <li key={index} className='mb-3'>
+                            <p className='text-base-content'><b>{index + 1}.</b> {definition.definition}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                    {meaning.definitions.some((definition) => definition.example) && (
+                      <div>
+                        <h2 className="text-accent text-xl font-semibold mb-3">Examples:</h2>
+                        {meaning.definitions.map(
+                          (definition, index) =>
+                            definition.example && (
+                              <p key={index} className="text-base-content mb-3">
+                                <b>-</b> {definition.example}
+                              </p>
+                            )
+                        )}
+                      </div>
+                    )}
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
           </main>
         </div>
